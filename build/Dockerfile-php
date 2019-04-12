@@ -1,0 +1,25 @@
+FROM php:7.0-fpm
+
+RUN apt-get update && apt-get install -y \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libmcrypt-dev \
+        libicu-dev \
+        g++ \
+        libxslt-dev \
+        libzip-dev \
+    && docker-php-ext-install -j$(nproc) \
+        gd \
+        mcrypt \
+        intl \
+        xsl \
+        zip \
+        pdo_mysql \
+        soap \
+        bcmath
+
+ENV COMPOSER_ALLOW_SUPERUSER 1
+
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+CMD ["php-fpm"]
