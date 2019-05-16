@@ -1,6 +1,7 @@
 FROM php:7.0-fpm
 
 RUN apt-get update && apt-get install -y \
+        libfreetype6-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
         libmcrypt-dev \
@@ -8,8 +9,16 @@ RUN apt-get update && apt-get install -y \
         g++ \
         libxslt-dev \
         libzip-dev \
+        unzip \
+    && docker-php-ext-configure gd \
+        --with-freetype-dir=/usr/lib/ \
+        --with-jpeg-dir=/usr/lib/ \
+        --with-png-dir=/usr/lib/ \
+        --with-gd \
     && docker-php-ext-install -j$(nproc) \
         gd \
+        iconv \
+        json \
         mcrypt \
         intl \
         xsl \
@@ -21,5 +30,7 @@ RUN apt-get update && apt-get install -y \
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+RUN echo "memory_limit=512M" > /usr/local/etc/php/php.ini
 
 CMD ["php-fpm"]
